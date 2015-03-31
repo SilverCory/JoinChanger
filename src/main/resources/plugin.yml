@@ -1,0 +1,5 @@
+main: eu.ac3_servers.dev.joinchanger.JoinChangerPlugin
+name: JoinChanger
+author: Cory Redmond
+version: 0.0.1-SNAPSHOT
+description: Change the join messages according to the group.

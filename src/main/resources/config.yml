@@ -1,0 +1,8 @@
+##############################
+# JoinChanger configuration. #
+##############################
+send_if_none: false
+groups:
+    player: '&3Welcome player: %name%'
+    VIP: '&4&lWelcome VIP &m%displayname%.'
+    owner: '&9&lWelcome the owner! &d&l%displayname%'
