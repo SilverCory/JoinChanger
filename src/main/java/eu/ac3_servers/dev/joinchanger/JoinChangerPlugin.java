@@ -1,23 +1,23 @@
 package eu.ac3_servers.dev.joinchanger;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.collect.Maps;
-
-public class JoinChangerPlugin extends JavaPlugin implements Listener {
+public final class JoinChangerPlugin extends JavaPlugin implements Listener {
 	
-	private HashMap<String, String> joinMessages = Maps.newHashMap();
-	private HashMap<String, String> leaveMessages = Maps.newHashMap();
+	private final Map<String, String> joinMessages = Maps.newHashMap();
+	private final Map<String, String> leaveMessages = Maps.newHashMap();
 	
-	private boolean sendIfNone = false;
+	private boolean sendIfNone;
 	
 	@Override
 	public void onEnable() {
@@ -36,65 +36,52 @@ public class JoinChangerPlugin extends JavaPlugin implements Listener {
 			leaveMessages.put(key.toUpperCase(), colour(section.getString(key)));
 		
 		getServer().getPluginManager().registerEvents(this, this);
-		
-	}
-	
-	private static String colour(String string) {
-		return ChatColor.translateAlternateColorCodes('&', string);
 	}
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		
 		for(String group : joinMessages.keySet())
 			if(e.getPlayer().hasPermission("joinchanger.group." + group)) {
-				String joinMessage = joinMessages.get(group);
-				joinMessage = joinMessage.replace("%name%", e.getPlayer().getName());
-				joinMessage = joinMessage.replace("%displayname%", e.getPlayer().getDisplayName());
-				if(joinMessage.equals("")) joinMessage = null;
+				String joinMessage = replacePlaceholders(joinMessages.get(group), e.getPlayer());
+				if(joinMessage != null && joinMessage.isEmpty()) joinMessage = null;
 				e.setJoinMessage(joinMessage);
 				return;
 			}
 		
 		if(!sendIfNone)
 			e.setJoinMessage(null);
-		
 	}
 	
 	@EventHandler
 	public void onPlayerKick(PlayerKickEvent e) {
-		
-		for(String group : leaveMessages.keySet())
-			if(e.getPlayer().hasPermission("joinchanger.group." + group)) {
-				String leaveMessage = leaveMessages.get(group);
-				leaveMessage = leaveMessage.replace("%name%", e.getPlayer().getName());
-				leaveMessage = leaveMessage.replace("%displayname%", e.getPlayer().getDisplayName());
-				if(leaveMessage.equals("")) leaveMessage = null;
-				e.setLeaveMessage(leaveMessage);
-				return;
-			}
-		
-		if(!sendIfNone)
-			e.setLeaveMessage(null);
-		
+		final String message = quit(e.getPlayer());
+
+		e.setLeaveMessage(message == null && !sendIfNone ? null : message);
 	}
 	
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
-		
-		for(String group : leaveMessages.keySet())
-			if(e.getPlayer().hasPermission("joinchanger.group." + group)) {
-				String leaveMessage = leaveMessages.get(group);
-				leaveMessage = leaveMessage.replace("%name%", e.getPlayer().getName());
-				leaveMessage = leaveMessage.replace("%displayname%", e.getPlayer().getDisplayName());
-				if(leaveMessage.equals("")) leaveMessage = null;
-				e.setQuitMessage(leaveMessage);
-				return;
-			}
-		
-		if(!sendIfNone)
-			e.setQuitMessage(null);
-		
+		final String message = quit(e.getPlayer());
+
+		e.setQuitMessage(message == null && !sendIfNone ? null : message);
 	}
 
+	private String replacePlaceholders(final String text, final Player player) {
+		return text == null || player == null ? null : text.
+				replaceAll("(?i)%name%", player.getName()).
+				replaceAll("(?i)%displayname%", player.getDisplayName());
+	}
+
+	private String quit(final Player player) {
+		for(String group : leaveMessages.keySet())
+			if (player.hasPermission("joinchanger.group." + group)) {
+				String leaveMessage = replacePlaceholders(leaveMessages.get(group), player);
+				return leaveMessage != null && leaveMessage.isEmpty() ? null : leaveMessage;
+			}
+		return null;
+	}
+
+	private static String colour(String string) {
+		return ChatColor.translateAlternateColorCodes('&', string);
+	}
 }
