@@ -6,3 +6,7 @@ groups:
     player: '&3Welcome player: %name%'
     VIP: '&4&lWelcome VIP &m%displayname%.'
     owner: '&9&lWelcome the owner! &d&l%displayname%'
+leaveGroups:
+    player: '&3Goodbye player: %name%'
+    VIP: '&4&lGoodbye VIP &m%displayname%.'
+    owner: '&9&lGoodbye the owner! &d&l%displayname%'

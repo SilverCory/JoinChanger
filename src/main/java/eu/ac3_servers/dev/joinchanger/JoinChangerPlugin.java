@@ -7,7 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.collect.Maps;
@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 public class JoinChangerPlugin extends JavaPlugin implements Listener {
 	
 	private HashMap<String, String> joinMessages = Maps.newHashMap();
+	private HashMap<String, String> leaveMessages = Maps.newHashMap();
 	
 	private boolean sendIfNone = false;
 	
@@ -29,6 +30,10 @@ public class JoinChangerPlugin extends JavaPlugin implements Listener {
 		ConfigurationSection section = getConfig().getConfigurationSection("groups");
 		for(String key : section.getKeys(false))
 			joinMessages.put(key.toUpperCase(), colour(section.getString(key)));
+			
+		section = getConfig().getConfigurationSection("leaveGroups");
+		for(String key : section.getKeys(false))
+			leaveMessages.put(key.toUpperCase(), colour(section.getString(key)));
 		
 		getServer().getPluginManager().registerEvents(this, this);
 		
@@ -46,12 +51,49 @@ public class JoinChangerPlugin extends JavaPlugin implements Listener {
 				String joinMessage = joinMessages.get(group);
 				joinMessage = joinMessage.replace("%name%", e.getPlayer().getName());
 				joinMessage = joinMessage.replace("%displayname%", e.getPlayer().getDisplayName());
+				if(joinMessage.equals("")) joinMessage = null;
 				e.setJoinMessage(joinMessage);
 				return;
 			}
 		
 		if(!sendIfNone)
 			e.setJoinMessage(null);
+		
+	}
+	
+	@EventHandler
+	public void onPlayerKick(PlayerKickEvent e) {
+		
+		for(String group : leaveMessages.keySet())
+			if(e.getPlayer().hasPermission("joinchanger.group." + group)) {
+				String leaveMessage = leaveMessages.get(group);
+				leaveMessage = leaveMessage.replace("%name%", e.getPlayer().getName());
+				leaveMessage = leaveMessage.replace("%displayname%", e.getPlayer().getDisplayName());
+				if(leaveMessage.equals("")) joinMessage = null;
+				e.setLeaveMessage(leaveMessage);
+				return;
+			}
+		
+		if(!sendIfNone)
+			e.setLeaveMessage(null);
+		
+	}
+	
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		
+		for(String group : leaveMessages.keySet())
+			if(e.getPlayer().hasPermission("joinchanger.group." + group)) {
+				String leaveMessage = leaveMessages.get(group);
+				leaveMessage = leaveMessage.replace("%name%", e.getPlayer().getName());
+				leaveMessage = leaveMessage.replace("%displayname%", e.getPlayer().getDisplayName());
+				if(leaveMessage.equals("")) joinMessage = null;
+				e.setQuitMessage(leaveMessage);
+				return;
+			}
+		
+		if(!sendIfNone)
+			e.setQuitMessage(null);
 		
 	}
 
