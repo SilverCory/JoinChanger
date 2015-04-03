@@ -69,7 +69,7 @@ public class JoinChangerPlugin extends JavaPlugin implements Listener {
 				String leaveMessage = leaveMessages.get(group);
 				leaveMessage = leaveMessage.replace("%name%", e.getPlayer().getName());
 				leaveMessage = leaveMessage.replace("%displayname%", e.getPlayer().getDisplayName());
-				if(leaveMessage.equals("")) joinMessage = null;
+				if(leaveMessage.equals("")) leaveMessage = null;
 				e.setLeaveMessage(leaveMessage);
 				return;
 			}
@@ -87,7 +87,7 @@ public class JoinChangerPlugin extends JavaPlugin implements Listener {
 				String leaveMessage = leaveMessages.get(group);
 				leaveMessage = leaveMessage.replace("%name%", e.getPlayer().getName());
 				leaveMessage = leaveMessage.replace("%displayname%", e.getPlayer().getDisplayName());
-				if(leaveMessage.equals("")) joinMessage = null;
+				if(leaveMessage.equals("")) leaveMessage = null;
 				e.setQuitMessage(leaveMessage);
 				return;
 			}
