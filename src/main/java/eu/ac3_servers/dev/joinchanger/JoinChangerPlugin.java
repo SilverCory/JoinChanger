@@ -10,12 +10,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.google.common.collect.Maps;
-
 public class JoinChangerPlugin extends JavaPlugin implements Listener {
 	
-	private HashMap<String, String> joinMessages = Maps.newHashMap();
-	private HashMap<String, String> leaveMessages = Maps.newHashMap();
+	private HashMap<String, String> joinMessages = new HashMap<>();
+	private HashMap<String, String> leaveMessages = new HashMap<>();
 	
 	private boolean sendIfNone = false;
 	
